@@ -1,0 +1,78 @@
+@define-color base   #282828;
+@define-color mantle #1d2021;
+@define-color crust  #161819;
+
+@define-color text    #ebdbb2;
+@define-color subtext #d5c4a1;
+
+@define-color purple #b16286;
+@define-color blue   #458588;
+@define-color green  #98971a;
+@define-color yellow #d79921;
+@define-color red    #cc241d;
+@define-color orange #d65d0e;
+
+* {
+  font-family: "JetBrainsMono Nerd Font", "SF Pro Display", sans-serif;
+  font-size: 11px;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+}
+
+window#waybar {
+  background: rgba(29, 32, 33, 0);
+  color: @text;
+}
+
+
+#workspaces button {
+  background: transparent;
+  color: @subtext;
+  margin: 2px 0px;
+  padding: 3px 6px;
+  border-radius: 10px;
+}
+
+#workspaces button.active {
+  background: rgba(177, 98, 134, 0.20);
+  color: @text;
+}
+
+#workspaces button.urgent {
+  background: rgba(204, 36, 29, 0.25);
+  color: @text;
+}
+
+#window, #cpu, #memory, #temperature, #disk, #network, #pulseaudio, #battery, #backlight, #clock,
+#custom-gpu, #custom-vram, #custom-power, #custom-fans, #custom-net, #custom-updates, #custom-notifications, #tray {
+  padding: 4px 8px;
+  margin: 2px 6px;
+  background: rgba(29, 32, 33, 0.65);
+  border-radius: 12px;
+}
+
+#temperature.critical {
+  background: rgba(204, 36, 29, 0.25);
+}
+
+#custom-gpu { border-left: 3px solid @purple; }
+#custom-vram { border-left: 3px solid @blue; }
+#custom-power { border-left: 3px solid @orange; }
+#custom-fans { border-left: 3px solid @green; }
+#custom-net { border-left: 3px solid @yellow; }
+#custom-powerprofile { border-left: 3px solid @blue; }
+#custom-focus { border-left: 3px solid @purple; }
+#custom-notifications { border-left: 3px solid @green; }
+
+#clock {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+#custom-powerprofile, #custom-focus {
+  padding: 4px 8px;
+  margin: 2px 6px;
+  background: rgba(29, 32, 33, 0.65);
+  border-radius: 12px;
+}

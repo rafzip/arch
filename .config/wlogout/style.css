@@ -1,0 +1,56 @@
+* {
+    font-family: "JetBrainsMono Nerd Font", monospace;
+    background-image: none;
+    box-shadow: none;
+    transition: 200ms ease-in-out;
+}
+
+window {
+    background-color: rgba(29, 32, 33, 0.95); /* bg0_hard */
+}
+
+button {
+    color: #ebdbb2; /* fg1 */
+    background-color: #282828; /* bg0 */
+    border: 2px solid #3c3836; /* bg1 */
+    border-radius: 12px;
+    margin: 20px;
+    font-size: 40px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 32px;
+}
+
+button:hover {
+    background-color: #3c3836; /* bg1 */
+    border-color: #fabd2f; /* yellow */
+    color: #fabd2f;
+}
+
+button:focus {
+    outline: none;
+}
+
+#lock {
+    border-color: #83a598; /* blue */
+}
+
+#logout {
+    border-color: #8ec07c; /* aqua */
+}
+
+#suspend {
+    border-color: #b8bb26; /* green */
+}
+
+#hibernate {
+    border-color: #d3869b; /* purple */
+}
+
+#shutdown {
+    border-color: #fb4934; /* red */
+}
+
+#reboot {
+    border-color: #fabd2f; /* yellow */
+}

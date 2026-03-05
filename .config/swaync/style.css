@@ -1,0 +1,98 @@
+* {
+  font-family: "JetBrainsMono Nerd Font", "SF Pro Display", sans-serif;
+  font-size: 12px;
+}
+
+.notification-row,
+.control-center,
+.control-center-list,
+.control-center-list-placeholder,
+.notification,
+.widget-title,
+.widget-dnd,
+.widget-dnd > switch,
+.widget-dnd > label,
+.widget-title > button,
+.floating-notifications .notification {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.control-center {
+  background: rgba(29, 32, 33, 0.96);
+  border: 1px solid #3c3836;
+  border-radius: 12px;
+  padding: 10px;
+  margin: 8px;
+}
+
+.control-center .notification {
+  background: rgba(40, 40, 40, 0.92);
+  border: 1px solid #504945;
+  border-radius: 12px;
+  padding: 8px;
+  margin: 6px 0;
+}
+
+.floating-notifications .notification {
+  background: rgba(29, 32, 33, 0.94);
+  border: 1px solid #504945;
+  border-radius: 12px;
+  padding: 8px;
+}
+
+.summary {
+  color: #ebdbb2;
+  font-weight: 700;
+}
+
+.time,
+.body,
+.control-center-list-placeholder {
+  color: #d5c4a1;
+}
+
+.widget-title {
+  margin-bottom: 6px;
+}
+
+.widget-title > label {
+  color: #ebdbb2;
+  font-weight: 700;
+}
+
+.widget-title > button {
+  background: #3c3836;
+  color: #ebdbb2;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.widget-title > button:hover {
+  background: #504945;
+}
+
+.widget-dnd {
+  margin: 4px 0 10px;
+}
+
+.widget-dnd > label {
+  color: #d5c4a1;
+}
+
+.widget-dnd > switch {
+  background: #3c3836;
+  border-radius: 20px;
+  min-width: 40px;
+  min-height: 22px;
+}
+
+.widget-dnd > switch:checked {
+  background: #b16286;
+}
+
+.widget-dnd > switch slider {
+  background: #ebdbb2;
+  border-radius: 20px;
+}

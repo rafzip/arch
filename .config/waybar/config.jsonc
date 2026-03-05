@@ -1,0 +1,174 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 28,
+  "exclusive": true,
+  "passthrough": false,
+  "gtk-layer-shell": true,
+  "fixed-center": true,
+
+  "modules-left": [
+    "hyprland/workspaces",
+    "hyprland/window"
+  ],
+
+  "modules-center": [
+    "cpu",
+    "memory",
+    "temperature",
+    "custom/gpu",
+    "custom/vram",
+    "custom/power",
+    "custom/fans",
+    "disk",
+    "custom/net"
+  ],
+
+  "modules-right": [
+    "custom/focus",
+    "custom/powerprofile",
+    "custom/notifications",
+    "pulseaudio",
+    "network",
+    "battery",
+    "backlight",
+    "clock",
+    "tray",
+    "custom/updates",
+    "idle_inhibitor"
+  ],
+
+
+  "hyprland/workspaces": {
+    "format": "{name}",
+    "on-scroll-up": "hyprctl dispatch workspace e+1",
+    "on-scroll-down": "hyprctl dispatch workspace e-1"
+  },
+
+  "hyprland/window": {
+    "format": "{title}",
+    "max-length": 18,
+    "separate-outputs": true
+  },
+
+  "clock": {
+    "format": "{:%a %d %b %H:%M}",
+    "tooltip-format": "{:%Y-%m-%d %H:%M:%S}",
+    "interval": 1
+  },
+
+  "cpu": {
+    "format": "CPU {usage}%",
+    "tooltip": true,
+    "interval": 2
+  },
+
+  "memory": {
+    "format": "RAM {used:0.1f}G/{total:0.1f}G",
+    "interval": 2
+  },
+
+  "temperature": {
+    "format": "TEMP {temperatureC}°C",
+    "interval": 2,
+    "critical-threshold": 90
+  },
+
+  "disk": {
+    "format": "SSD {percentage_used}%",
+    "path": "/",
+    "interval": 10
+  },
+
+  "network": {
+    "format-wifi": "WiFi {essid}",
+    "format-ethernet": "LAN",
+    "format-disconnected": "NoNet",
+    "tooltip": true,
+    "interval": 2
+  },
+
+  "pulseaudio": {
+    "format": "VOL {volume}%",
+    "format-muted": "MUTED",
+    "scroll-step": 3
+  },
+
+  "battery": {
+    "format": "BAT {capacity}%",
+    "format-charging": "CHG {capacity}%",
+    "format-plugged": "AC {capacity}%",
+    "interval": 5
+  },
+
+  "backlight": {
+    "format": "BRT {percent}%",
+    "interval": 2
+  },
+
+  "tray": {
+    "icon-size": 14,
+    "spacing": 4
+  },
+
+  "custom/gpu": {
+    "exec": "~/.config/waybar/scripts/gpu-waybar.sh",
+    "return-type": "json",
+    "interval": 2
+  },
+
+  "custom/vram": {
+    "exec": "~/.config/waybar/scripts/vram-waybar.sh",
+    "return-type": "json",
+    "interval": 2
+  },
+
+  "custom/power": {
+    "exec": "~/.config/waybar/scripts/power-waybar.sh",
+    "return-type": "json",
+    "interval": 2
+  },
+
+  "custom/fans": {
+    "exec": "~/.config/waybar/scripts/fan-waybar.sh",
+    "return-type": "json",
+    "interval": 2
+  },
+
+  "custom/net": {
+    "exec": "~/.config/waybar/scripts/net-waybar.sh",
+    "return-type": "json",
+    "interval": 1
+  },
+
+  "custom/updates": {
+    "exec": "~/.config/waybar/scripts/updates-waybar.sh",
+    "return-type": "json",
+    "interval": 600,
+    "on-click": "kitty -e bash -lc 'sudo pacman -Syu; read -n 1'"
+  },
+
+  "custom/powerprofile": {
+    "exec": "~/.config/waybar/scripts/powerprofile-waybar.sh",
+    "return-type": "json",
+    "interval": 3,
+    "on-click": "~/.config/waybar/scripts/powerprofile-waybar.sh --toggle"
+  },
+
+  "custom/focus": {
+    "exec": "~/.config/waybar/scripts/focus-waybar.sh",
+    "return-type": "json",
+    "interval": 1,
+    "on-click": "~/.config/hypr/scripts/focus-mode.sh toggle"
+  },
+
+  "custom/notifications": {
+    "exec-if": "command -v swaync-client",
+    "exec": "swaync-client -swb",
+    "return-type": "json",
+    "interval": 2,
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "escape": true
+  }
+}

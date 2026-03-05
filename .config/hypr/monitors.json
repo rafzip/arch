@@ -1,0 +1,37 @@
+{
+  "workspaces": [
+    {
+      "name": "Default",
+      "monitors": {
+        "desc:Dell Inc. DELL U2419H 5QHSLS2": {
+          "resolution": "1920x1080",
+          "refresh_rate": 60.0,
+          "scale": 1.0,
+          "rotation": 0,
+          "position_x": 2880,
+          "position_y": 0,
+          "is_primary": true
+        },
+        "desc:Dell Inc. DELL U2414H H8H7G4321YPL": {
+          "resolution": "1920x1080",
+          "refresh_rate": 60.0,
+          "scale": 1.0,
+          "rotation": 3,
+          "position_x": 4800,
+          "position_y": 0,
+          "is_primary": false
+        },
+        "eDP-1": {
+          "resolution": "2880x1800",
+          "refresh_rate": 120.0,
+          "scale": 1.0,
+          "rotation": 0,
+          "position_x": 0,
+          "position_y": 0,
+          "is_primary": false
+        }
+      }
+    }
+  ],
+  "active_workspace": 0
+}

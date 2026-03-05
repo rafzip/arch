@@ -1,0 +1,10 @@
+[color]
+horizontal_gradient = 1
+horizontal_gradient_color_1 = '#eba0ac'  # maroon
+horizontal_gradient_color_2 = '#f5c2e7'  # pink
+horizontal_gradient_color_3 = '#cdd6f4'  # text
+horizontal_gradient_color_4 = '#bac2de'  # subtext1
+horizontal_gradient_color_5 = '#89dceb'  # sky
+horizontal_gradient_color_6 = '#74c7ec'  # sapphire
+horizontal_gradient_color_7 = '#89b4fa'  # blue
+horizontal_gradient_color_8 = '#cba6f7'  # mauve
