@@ -1,12 +1,11 @@
 {
   "headers": [
     {
-      "source": "/files/:path*",
+      "source": "/(.*)",
       "headers": [
-        {
-          "key": "Content-Disposition",
-          "value": "inline"
-        }
+        { "key": "Content-Disposition", "value": "inline" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
       ]
     }
   ]
