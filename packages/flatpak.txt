@@ -1,0 +1,8 @@
+# Format:
+#   app.id
+#   app.id if:FLAG_NAME
+#   app.id optional
+
+com.heroicgameslauncher.hgl
+com.usebottles.bottles
+net.davidotek.pupgui2

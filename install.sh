@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-#############################################
-# Post-install for Arch on ASUS Zephyrus G14 #
-# AMD CPU + NVIDIA GPU, Wayland, GDM, GNOME #
-# + Hyprland, Gaming/School/Dev, USB import #
-#############################################
-
 # ----------------------------
 # User-tunable options
 # ----------------------------
@@ -35,11 +29,14 @@ INSTALL_FLATPAK=1
 INSTALL_DOCKER=1
 INSTALL_VIRT=1
 INSTALL_LATEX=0       # texlive-most is very large; keep off unless you want it
+INSTALL_DOTS=1
 
 # Dotfiles (optional). If empty, script skips.
 DOTFILES_GIT_URL=""   # e.g. "https://github.com/you/dotfiles.git"
 DOTFILES_DIR_NAME=".dotfiles"
 DOTFILES_APPLY_CMD="" # e.g. "stow -vR -t ~ ." OR "./install.sh"
+REPO_GIT_URL="${REPO_GIT_URL:-https://github.com/rafzip/arch.git}"
+REPO_BRANCH="${REPO_BRANCH:-main}"
 
 # USB import:
 # If you know the exact block device, set it (example "/dev/sda1"). Otherwise auto-detect.
@@ -52,6 +49,12 @@ USB_DEST_SUBDIR="usb-import"
 # You can tighten later to something like:
 #   "~alsa_card.pci-0000_65_00.6.*"
 SOFTVOL_DEVICE_NAME_REGEX="~alsa_card.pci-0000_.*"
+
+# Package manifests. Local files are preferred; curl mode falls back to base URL.
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+PACKAGE_MANIFESTS_DIR="${PACKAGE_MANIFESTS_DIR:-${SCRIPT_DIR}/packages}"
+PACKAGE_MANIFESTS_BASE_URL="${PACKAGE_MANIFESTS_BASE_URL:-https://raw.githubusercontent.com/rafzip/arch/main/packages}"
+MANIFEST_CACHE_DIR=""
 
 # ----------------------------
 # Helpers
@@ -70,6 +73,182 @@ as_user() {
 pacman_install() {
   # shellcheck disable=SC2068
   pacman -S --needed --noconfirm "$@"
+}
+
+trim_line() {
+  local s="$1"
+  s="${s#"${s%%[![:space:]]*}"}"
+  s="${s%"${s##*[![:space:]]}"}"
+  printf '%s' "$s"
+}
+
+get_manifest_file() {
+  local manifest_name="$1"
+  local local_path="${PACKAGE_MANIFESTS_DIR}/${manifest_name}"
+  local remote_url cached_path
+
+  if [[ -f "$local_path" ]]; then
+    printf '%s\n' "$local_path"
+    return 0
+  fi
+
+  need_cmd curl
+  remote_url="${PACKAGE_MANIFESTS_BASE_URL%/}/${manifest_name}"
+  if [[ -z "$MANIFEST_CACHE_DIR" ]]; then
+    MANIFEST_CACHE_DIR="$(mktemp -d /tmp/install-manifests.XXXXXX)"
+  fi
+  cached_path="${MANIFEST_CACHE_DIR}/${manifest_name}"
+
+  log "Fetching package manifest: $remote_url"
+  curl -fsSL "$remote_url" -o "$cached_path" || die "Failed to fetch manifest: $remote_url"
+  printf '%s\n' "$cached_path"
+}
+
+install_pacman_from_manifest() {
+  local manifest_file="$1"
+  local line token pkg flag optional enabled
+  local -a required_pkgs=()
+  local -a optional_pkgs=()
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line%%#*}"
+    line="$(trim_line "$line")"
+    [[ -z "$line" ]] && continue
+                                                # hi :)
+    pkg=""
+    optional=0
+    enabled=1
+
+    for token in $line; do
+      if [[ -z "$pkg" ]]; then
+        pkg="$token"
+        continue
+      fi
+      if [[ "$token" == optional ]]; then
+        optional=1
+        continue
+      fi
+      if [[ "$token" == if:* ]]; then
+        flag="${token#if:}"
+        [[ "${!flag:-0}" == "1" ]] || enabled=0
+        continue
+      fi
+      warn "Ignoring unknown token '$token' in $manifest_file"
+    done
+
+    [[ "$enabled" == "1" ]] || continue
+
+    if [[ "$pkg" == \$* ]]; then
+      flag="${pkg#\$}"
+      pkg="${!flag:-}"
+      if [[ -z "$pkg" ]]; then
+        warn "Variable '$flag' is empty; skipping manifest entry in $manifest_file"
+        continue
+      fi
+    fi
+
+    if [[ "$optional" == "1" ]]; then
+      optional_pkgs+=("$pkg")
+    else
+      required_pkgs+=("$pkg")
+    fi
+  done < "$manifest_file"
+
+  if ((${#required_pkgs[@]})); then
+    pacman_install "${required_pkgs[@]}"
+  fi
+
+  for pkg in "${optional_pkgs[@]}"; do
+    pacman_install "$pkg" || warn "Optional pacman package failed: $pkg"
+  done
+}
+
+install_yay_from_manifest() {
+  local manifest_file="$1"
+  local line token pkg flag optional enabled
+  local -a required_pkgs=()
+  local -a optional_pkgs=()
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line%%#*}"
+    line="$(trim_line "$line")"
+    [[ -z "$line" ]] && continue
+
+    pkg=""
+    optional=0
+    enabled=1
+
+    for token in $line; do
+      if [[ -z "$pkg" ]]; then
+        pkg="$token"
+        continue
+      fi
+      if [[ "$token" == optional ]]; then
+        optional=1
+        continue
+      fi
+      if [[ "$token" == if:* ]]; then
+        flag="${token#if:}"
+        [[ "${!flag:-0}" == "1" ]] || enabled=0
+        continue
+      fi
+      warn "Ignoring unknown token '$token' in $manifest_file"
+    done
+
+    [[ "$enabled" == "1" ]] || continue
+    if [[ "$optional" == "1" ]]; then
+      optional_pkgs+=("$pkg")
+    else
+      required_pkgs+=("$pkg")
+    fi
+  done < "$manifest_file"
+
+  if ((${#required_pkgs[@]})); then
+    sudo -u "$TARGET_USER" -H yay -S --needed --noconfirm --answerdiff None --answerclean None "${required_pkgs[@]}" \
+      || warn "Failed to install one or more required AUR packages from $manifest_file."
+  fi
+
+  for pkg in "${optional_pkgs[@]}"; do
+    sudo -u "$TARGET_USER" -H yay -S --needed --noconfirm --answerdiff None --answerclean None "$pkg" \
+      || warn "Optional AUR package failed: $pkg"
+  done
+}
+
+install_flatpak_from_manifest() {
+  local manifest_file="$1"
+  local line token app_id flag enabled
+  local -a apps=()
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    line="${line%%#*}"
+    line="$(trim_line "$line")"
+    [[ -z "$line" ]] && continue
+
+    app_id=""
+    enabled=1
+    for token in $line; do
+      if [[ -z "$app_id" ]]; then
+        app_id="$token"
+        continue
+      fi
+      if [[ "$token" == if:* ]]; then
+        flag="${token#if:}"
+        [[ "${!flag:-0}" == "1" ]] || enabled=0
+        continue
+      fi
+      if [[ "$token" == optional ]]; then
+        continue
+      fi
+      warn "Ignoring unknown token '$token' in $manifest_file"
+    done
+
+    [[ "$enabled" == "1" ]] || continue
+    apps+=("$app_id")
+  done < "$manifest_file"
+
+  for app_id in "${apps[@]}"; do
+    sudo -u "$TARGET_USER" -H flatpak install -y flathub "$app_id" || warn "Flatpak app failed: $app_id"
+  done
 }
 
 pacman_remove_if_present() {
@@ -205,8 +384,7 @@ EOF
 }
 
 install_audio_stack_and_softvol_override() {
-  log "Installing PipeWire + WirePlumber + ALSA utils"
-  pacman_install pipewire wireplumber pipewire-alsa pipewire-pulse alsa-utils sof-firmware pavucontrol
+  log "Configuring WirePlumber software-volume override"
 
   # WirePlumber config: api.alsa.soft-mixer=true disables hardware mixer for volume control,
   # and uses software volume instead. :contentReference[oaicite:8]{index=8}
@@ -235,21 +413,27 @@ EOF"
   log "Tip: to tighten matching later, find your device name via: pactl list cards | grep -E 'Name:|alsa_card' -n"
 }
 
-install_dotfiles_optional() {
-  if [[ -z "$DOTFILES_GIT_URL" ]]; then
-    log "DOTFILES_GIT_URL empty; skipping dotfiles."
+run_dots_installer() {
+  local dots_script="${SCRIPT_DIR}/dots/install-dots.sh"
+  local tmp_repo="/tmp/arch-dots-${TARGET_USER}"
+
+  if [[ -f "$dots_script" ]]; then
+    log "Running local dots installer: $dots_script"
+    as_user "DOTS_REPLACE_ZSHRC=no bash '$dots_script'" || warn "Local dots installer failed."
     return 0
   fi
 
-  log "Cloning dotfiles into ~/${DOTFILES_DIR_NAME}"
-  pacman_install git
-  as_user "rm -rf ~/'$DOTFILES_DIR_NAME' && git clone '$DOTFILES_GIT_URL' ~/'$DOTFILES_DIR_NAME'"
+  # curl | sh execution usually has no repo checkout nearby, so fetch one temporarily.
+  log "Local dots installer not found. Cloning dots from ${REPO_GIT_URL} (${REPO_BRANCH})"
+  as_user "rm -rf '$tmp_repo' && git clone --depth 1 --branch '$REPO_BRANCH' '$REPO_GIT_URL' '$tmp_repo'" || {
+    warn "Failed to clone repo for dots installer."
+    return 1
+  }
 
-  if [[ -n "$DOTFILES_APPLY_CMD" ]]; then
-    log "Applying dotfiles with your command: $DOTFILES_APPLY_CMD"
-    as_user "cd ~/'$DOTFILES_DIR_NAME' && $DOTFILES_APPLY_CMD"
+  if as_user "[[ -f '$tmp_repo/dots/install-dots.sh' ]]"; then
+    as_user "DOTS_REPLACE_ZSHRC=no bash '$tmp_repo/dots/install-dots.sh'" || warn "Cloned dots installer failed."
   else
-    warn "DOTFILES_APPLY_CMD empty. Clone done, but no apply step ran."
+    warn "dots/install-dots.sh not found in cloned repo; skipping dots install."
   fi
 }
 
@@ -283,112 +467,32 @@ fi
 log "Full system update"
 pacman -Syu --noconfirm
 
-# ----------------------------
-# Base / quality-of-life
-# ----------------------------
-log "Installing base system tools"
-pacman_install \
-  base-devel git curl wget \
-  linux-firmware amd-ucode \
-  nano vim neovim \
-  zsh \
-  openssh \
-  rsync \
-  unzip zip p7zip unrar \
-  jq yq \
-  pacman-contrib \
-  man-db man-pages \
-  bash-completion \
-  reflector \
-  fwupd \
-  lm_sensors \
-  acpi \
-  htop btop \
-  fastfetch \
-  ripgrep fd bat eza fzf \
-  tmux \
-  chrony
+PACMAN_MANIFEST="$(get_manifest_file pacman.txt)"
 
+if [[ "$INSTALL_ASUS_TOOLS" == "1" && "$USE_G14_REPO" != "1" ]]; then
+  warn "INSTALL_ASUS_TOOLS=1 but USE_G14_REPO=0. Installing asusctl/rog-control-center may be suboptimal."
+fi
+
+log "Installing pacman packages from manifest"
+install_pacman_from_manifest "$PACMAN_MANIFEST"
+
+log "Enabling key services"
 systemctl enable --now chronyd || true
-
-log "Filesystems / removable media helpers"
-pacman_install \
-  exfatprogs dosfstools ntfs-3g \
-  gvfs gvfs-mtp gvfs-smb
-
-# ----------------------------
-# Desktop: GDM + GNOME core + Hyprland
-# ----------------------------
-log "Installing GDM + GNOME core (without default GNOME apps)"
-pacman_install \
-  gdm \
-  gnome-shell gnome-session gnome-settings-daemon gnome-control-center \
-  gnome-keyring \
-  nautilus \
-  xdg-desktop-portal xdg-desktop-portal-gnome
-
-log "Installing Hyprland stack"
-pacman_install \
-  hyprland xdg-desktop-portal-hyprland \
-  hyprlock waybar wofi dunst \
-  kitty cava \
-  swww cliphist \
-  grim slurp swappy wl-clipboard \
-  libnotify \
-  brightnessctl playerctl \
-  networkmanager network-manager-applet nm-connection-editor \
-  power-profiles-daemon \
-  ttf-jetbrains-mono-nerd \
-  polkit-gnome \
-  qt6-wayland qt5-wayland
-
-log "Enabling NetworkManager + power profiles daemon"
 systemctl enable --now NetworkManager || true
 systemctl enable --now power-profiles-daemon || true
-
-log "Enabling GDM"
-systemctl enable gdm
-
-# ----------------------------
-# NVIDIA + Wayland essentials
-# ----------------------------
-log "Installing graphics stack (Mesa + NVIDIA + Vulkan + video accel bits)"
-pacman_install \
-  mesa lib32-mesa \
-  vulkan-icd-loader lib32-vulkan-icd-loader vulkan-tools \
-  "${NVIDIA_DRIVER_PKG}" nvidia-utils lib32-nvidia-utils nvidia-settings \
-  opencl-nvidia \
-  egl-wayland \
-  libva-nvidia-driver
+systemctl enable gdm || true
 
 setup_nvidia_modeset
 if [[ "$PATCH_BOOTLOADER" == "1" ]]; then
   patch_bootloader_cmdline
 fi
 
-# ----------------------------
-# ASUS laptop tools (optional)
-# ----------------------------
-if [[ "$INSTALL_ASUS_TOOLS" == "1" ]]; then
-  if [[ "$USE_G14_REPO" != "1" ]]; then
-    warn "INSTALL_ASUS_TOOLS=1 but USE_G14_REPO=0. Installing asusctl may be suboptimal."
-  fi
-  log "Installing ASUS control tools"
-  pacman_install asusctl power-profiles-daemon
-  systemctl enable --now power-profiles-daemon || true
-
-  # rog-control-center is in the g14 repo per asus-linux guide
-  pacman_install rog-control-center || true
-fi
-
 if [[ "$INSTALL_SUPERGFXCTL" == "1" ]]; then
-  log "Installing supergfxctl (note: asus-linux warns it's being phased out / unadvised unless needed)"
-  pacman_install supergfxctl
-  systemctl enable --now supergfxd
+  systemctl enable --now supergfxd || true
 fi
 
 # ----------------------------
-# Audio: PipeWire + WirePlumber + soft volume override
+# Audio: WirePlumber soft volume override
 # ----------------------------
 install_audio_stack_and_softvol_override
 
@@ -408,107 +512,49 @@ GNOME_DEFAULT_APPS_TO_REMOVE=(
 )
 pacman_remove_if_present "${GNOME_DEFAULT_APPS_TO_REMOVE[@]}"
 
-# ----------------------------
-# Gaming stack
-# ----------------------------
-log "Installing gaming stack (Steam/Proton/Wine/Lutris/Gamemode/MangoHud/Gamescope)"
-pacman_install \
-  steam \
-  wine-staging winetricks \
-  lutris \
-  gamemode lib32-gamemode \
-  mangohud lib32-mangohud \
-  gamescope \
-  goverlay \
-  obs-studio
-
 # Controllers rules package sometimes exists separately on Arch; install if available.
 if pacman -Si steam-devices >/dev/null 2>&1; then
   pacman_install steam-devices
 fi
 
-# ----------------------------
-# Programming / dev stack
-# ----------------------------
-log "Installing dev stack"
-pacman_install \
-  gcc clang lld lldb gdb cmake ninja make pkgconf \
-  python python-pip python-virtualenv pipx \
-  nodejs npm \
-  go rustup \
-  jdk-openjdk maven gradle \
-  shellcheck shfmt \
-  sqlite postgresql-libs \
-  direnv \
-  wireshark-cli \
-  git-lfs \
-  vscode || true
-
 # Rust toolchain via rustup (non-root)
 as_user "rustup toolchain install stable && rustup default stable" || true
 
 if install_yay_if_missing; then
-  log "Installing requested AUR packages (bambustudio, spotify, overskride, brew)"
-  as_user "yay -S --needed --noconfirm --answerdiff None --answerclean None bambustudio zen-browser-bin wlogout spotify overskride brew vesktop" || warn "Failed to install one or more requested AUR packages."
+  YAY_MANIFEST="$(get_manifest_file yay.txt)"
+  log "Installing AUR packages from manifest"
+  install_yay_from_manifest "$YAY_MANIFEST"
 else
   warn "Skipping AUR packages because yay could not be installed."
 fi
 
 if [[ "$INSTALL_DOCKER" == "1" ]]; then
   log "Enabling Docker + adding user to docker group"
-  pacman_install \
-    docker \
-    docker-compose
-  systemctl enable --now docker
+  systemctl enable --now docker || true
   if ! getent group docker >/dev/null; then groupadd docker || true; fi
   usermod -aG docker "$TARGET_USER" || true
 fi
 
 if [[ "$INSTALL_VIRT" == "1" ]]; then
-  log "Installing virtualization stack"
-  pacman_install qemu-full virt-manager libvirt dnsmasq vde2 ebtables iptables-nft
-  systemctl enable --now libvirtd
+  log "Enabling virtualization services + permissions"
+  systemctl enable --now libvirtd || true
   usermod -aG libvirt "$TARGET_USER" || true
-fi
-
-# ----------------------------
-# School / productivity stack
-# ----------------------------
-log "Installing school/productivity tools"
-pacman_install \
-  libreoffice-fresh \
-  gimp inkscape \
-  blender \
-  pandoc \
-  texinfo \
-  anki \
-  krita \
-  keepassxc
-
-if [[ "$INSTALL_LATEX" == "1" ]]; then
-  log "Installing LaTeX (texlive-most) — this is huge"
-  pacman_install texlive-most biber
 fi
 
 # ----------------------------
 # Flatpak apps (optional)
 # ----------------------------
 if [[ "$INSTALL_FLATPAK" == "1" ]]; then
+  FLATPAK_MANIFEST="$(get_manifest_file flatpak.txt)"
   log "Setting up Flatpak + Flathub"
-  pacman_install flatpak
   as_user "flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
-
-  # Common “gaming helpers” not always ideal via pacman:
-  # Heroic, Bottles, ProtonUp-Qt are readily available on Flathub.
-  as_user "flatpak install -y flathub com.heroicgameslauncher.hgl || true"
-  as_user "flatpak install -y flathub com.usebottles.bottles || true"
-  as_user "flatpak install -y flathub net.davidotek.pupgui2 || true" # ProtonUp-Qt
+  install_flatpak_from_manifest "$FLATPAK_MANIFEST"
 fi
 
-# ----------------------------
-# Dotfiles (optional)
-# ----------------------------
-# install_dotfiles_optional
+if [[ "$INSTALL_DOTS" == "1" ]]; then
+  run_dots_installer || warn "Dotfiles setup failed."
+fi
+
 
 log "DONE."
 log "Recommended next steps:"

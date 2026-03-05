@@ -1,0 +1,12 @@
+# Format:
+#   package
+#   package if:FLAG_NAME
+#   package optional
+
+bambustudio
+zen-browser-bin
+wlogout
+spotify
+overskride
+brew
+vesktop
