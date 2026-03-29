@@ -1,6 +1,8 @@
 show=drun
-width=500
+width=350
 height=350
-prompt=Search…
+prompt=drun
 insensitive=true
 term=kitty
+allow_images=true
+fuzzy=true

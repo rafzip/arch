@@ -13,11 +13,11 @@ INSTALL_ASUS_TOOLS=1
 
 # supergfxctl is warned as "being phased out / unadvised unless you really need it"
 # by the asus-linux Arch guide. Enable only if you know you want it.
-INSTALL_SUPERGFXCTL=0
+INSTALL_SUPERGFXCTL=1
 
 # If you installed a custom kernel (like linux-g14), prefer DKMS driver:
 # For stock Arch kernel you can still use nvidia-open-dkms safely; DKMS is flexible.
-NVIDIA_DRIVER_PKG="nvidia-open-dkms"   # alternative: "nvidia" (stock-kernel only)
+NVIDIA_DRIVER_PKG="nvidia-open"   # alternative: "nvidia" (stock-kernel only)
 
 # Patch bootloader to add kernel parameter (best-effort, supports GRUB + systemd-boot):
 PATCH_BOOTLOADER=1
@@ -31,10 +31,6 @@ INSTALL_VIRT=1
 INSTALL_LATEX=0       # texlive-most is very large; keep off unless you want it
 INSTALL_DOTS=1
 
-# Dotfiles (optional). If empty, script skips.
-DOTFILES_GIT_URL=""   # e.g. "https://github.com/you/dotfiles.git"
-DOTFILES_DIR_NAME=".dotfiles"
-DOTFILES_APPLY_CMD="" # e.g. "stow -vR -t ~ ." OR "./install.sh"
 REPO_GIT_URL="${REPO_GIT_URL:-https://github.com/rafzip/arch.git}"
 REPO_BRANCH="${REPO_BRANCH:-main}"
 
@@ -249,22 +245,6 @@ install_flatpak_from_manifest() {
   for app_id in "${apps[@]}"; do
     sudo -u "$TARGET_USER" -H flatpak install -y flathub "$app_id" || warn "Flatpak app failed: $app_id"
   done
-}
-
-pacman_remove_if_present() {
-  local pkgs=("$@")
-  local to_remove=()
-  for p in "${pkgs[@]}"; do
-    if pacman -Q "$p" >/dev/null 2>&1; then
-      to_remove+=("$p")
-    fi
-  done
-  if ((${#to_remove[@]})); then
-    log "Removing GNOME default apps (requested): ${to_remove[*]}"
-    pacman -Rns --noconfirm "${to_remove[@]}" || true
-  else
-    log "No GNOME default apps from removal list are installed. Skipping remove."
-  fi
 }
 
 install_yay_if_missing() {
@@ -496,28 +476,10 @@ fi
 # ----------------------------
 install_audio_stack_and_softvol_override
 
-# ----------------------------
-# Remove default GNOME apps (keep Files + Control Center + core)
-# ----------------------------
-# Based on Arch "gnome" group listing; remove user-facing defaults.
-# (We intentionally do NOT remove nautilus, gnome-control-center, gnome-shell, gdm, etc.)
-# :contentReference[oaicite:10]{index=10}
-GNOME_DEFAULT_APPS_TO_REMOVE=(
-  gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-connections
-  gnome-console gnome-contacts gnome-disk-utility gnome-font-viewer gnome-logs
-  gnome-maps gnome-music gnome-software gnome-system-monitor gnome-text-editor
-  gnome-tour gnome-user-docs gnome-user-share gnome-weather
-  loupe papers showtime simple-scan sushi tecla yelp rygel orca malcontent
-  gnome-remote-desktop
-)
-pacman_remove_if_present "${GNOME_DEFAULT_APPS_TO_REMOVE[@]}"
-
-# Controllers rules package sometimes exists separately on Arch; install if available.
 if pacman -Si steam-devices >/dev/null 2>&1; then
   pacman_install steam-devices
 fi
 
-# Rust toolchain via rustup (non-root)
 as_user "rustup toolchain install stable && rustup default stable" || true
 
 if install_yay_if_missing; then
@@ -541,9 +503,6 @@ if [[ "$INSTALL_VIRT" == "1" ]]; then
   usermod -aG libvirt "$TARGET_USER" || true
 fi
 
-# ----------------------------
-# Flatpak apps (optional)
-# ----------------------------
 if [[ "$INSTALL_FLATPAK" == "1" ]]; then
   FLATPAK_MANIFEST="$(get_manifest_file flatpak.txt)"
   log "Setting up Flatpak + Flathub"

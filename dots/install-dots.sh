@@ -39,7 +39,6 @@ link "$ROOT/.config/kitty"  "$HOME/.config/kitty"
 link "$ROOT/.config/fastfetch"  "$HOME/.config/fastfetch"
 link "$ROOT/.config/cava"  "$HOME/.config/cava"
 link "$ROOT/.config/wlogout"  "$HOME/.config/wlogout"
-link "$ROOT/.wallpapers" "$HOME/.wallpapers"
 
 replace_zshrc="${DOTS_REPLACE_ZSHRC:-ask}"
 should_replace=0

@@ -52,8 +52,8 @@ gvfs
 gvfs-mtp
 gvfs-smb
 
-# Desktop: GDM + GNOME core + Hyprland
-gdm
+# Desktop: LY + GNOME core + Hyprland
+ly
 gnome-shell
 gnome-session
 gnome-settings-daemon
@@ -70,7 +70,7 @@ wofi
 dunst
 kitty
 cava
-swww
+awww
 cliphist
 grim
 slurp
