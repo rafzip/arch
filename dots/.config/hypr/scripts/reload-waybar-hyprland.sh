@@ -8,3 +8,7 @@ hyprctl reload
 # Restart waybar cleanly.
 pkill -x waybar 2>/dev/null || true
 nohup waybar >/dev/null 2>&1 &
+
+# hypridle
+pkill -x hypridle 2>/dev/null || true
+nohup hypridle >/dev/null 2>&1 &

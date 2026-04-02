@@ -26,7 +26,8 @@
 
   "modules-right": [
     "custom/focus",
-    "custom/powerprofile",
+    "power-profiles-daemon",
+    "custom/swaync-dnd",
     "custom/notifications",
     "pulseaudio",
     "network",
@@ -148,18 +149,33 @@
     "on-click": "kitty -e bash -lc 'sudo pacman -Syu; read -n 1'"
   },
 
-  "custom/powerprofile": {
-    "exec": "~/.config/waybar/scripts/powerprofile-waybar.sh",
-    "return-type": "json",
-    "interval": 3,
-    "on-click": "~/.config/waybar/scripts/powerprofile-waybar.sh --toggle"
-  },
+"power-profiles-daemon": {
+    "format": "{icon} {profile}",
+    "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
+    "tooltip": true,
+    "format-icons": {
+      "default": "",
+      "performance": "",
+      "balanced": "",
+      "power-saver": ""
+    }
+},
 
   "custom/focus": {
     "exec": "~/.config/waybar/scripts/focus-waybar.sh",
     "return-type": "json",
     "interval": 1,
     "on-click": "~/.config/hypr/scripts/focus-mode.sh toggle"
+  },
+
+  "custom/swaync-dnd": {
+    "exec-if": "command -v swaync-client",
+    "exec": "~/.config/waybar/scripts/swaync-dnd.sh",
+    "return-type": "json",
+    "interval": 1,
+    "on-click": "swaync-client -d",
+    "on-click-right": "swaync-client -df",
+    "on-click-middle": "swaync-client -dn"
   },
 
   "custom/notifications": {

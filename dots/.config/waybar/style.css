@@ -45,7 +45,7 @@ window#waybar {
 }
 
 #window, #cpu, #memory, #temperature, #disk, #network, #pulseaudio, #battery, #backlight, #clock,
-#custom-gpu, #custom-vram, #custom-power, #custom-fans, #custom-net, #custom-updates, #custom-notifications, #tray {
+#custom-gpu, #custom-vram, #custom-power, #custom-fans, #custom-net, #custom-updates, #custom-swaync-dnd, #power-profiles-daemon, #custom-notifications, #tray {
   padding: 4px 8px;
   margin: 2px 6px;
   background: rgba(29, 32, 33, 0.65);
@@ -61,16 +61,23 @@ window#waybar {
 #custom-power { border-left: 3px solid @orange; }
 #custom-fans { border-left: 3px solid @green; }
 #custom-net { border-left: 3px solid @yellow; }
-#custom-powerprofile { border-left: 3px solid @blue; }
+#power-profiles-daemon { border-left: 3px solid @blue; }
 #custom-focus { border-left: 3px solid @purple; }
+#custom-swaync-dnd { border-left: 3px solid @yellow; }
 #custom-notifications { border-left: 3px solid @green; }
+
+#custom-swaync-dnd.active {
+  background: rgba(29, 32, 33, 0.65);
+  color: @text;
+  font-weight: 600;
+}
 
 #clock {
   font-weight: 600;
   letter-spacing: 0.2px;
 }
 
-#custom-powerprofile, #custom-focus {
+#custom-focus {
   padding: 4px 8px;
   margin: 2px 6px;
   background: rgba(29, 32, 33, 0.65);
