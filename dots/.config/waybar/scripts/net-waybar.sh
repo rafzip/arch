@@ -4,7 +4,7 @@ set -euo pipefail
 # Simple per-second net throughput on default route iface
 iface="$(ip route 2>/dev/null | awk '/default/ {print $5; exit}')"
 if [ -z "${iface}" ]; then
-  echo "{\"text\":\"NET --\",\"tooltip\":\"No default route\"}"
+  echo "{\"text\":\" --\",\"tooltip\":\"No default route\"}"
   exit 0
 fi
 
@@ -24,4 +24,4 @@ hr() {
   else echo "${b}B/s"; fi
 }
 
-echo "{\"text\":\"↓ $(hr "$rx") ↑ $(hr "$tx")\",\"tooltip\":\"Interface: ${iface}\nRX: ${rx2}\nTX: ${tx2}\"}"
+  echo "{\"text\":\"↓ $(hr "$rx") ↑ $(hr "$tx")\",\"tooltip\":\"Interface: ${iface}\nRX: ${rx2}\nTX: ${tx2}\"}"

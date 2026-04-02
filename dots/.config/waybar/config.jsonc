@@ -25,7 +25,6 @@
   ],
 
   "modules-right": [
-    "custom/focus",
     "power-profiles-daemon",
     "custom/swaync-dnd",
     "custom/notifications",
@@ -38,7 +37,6 @@
     "custom/updates",
     "idle_inhibitor"
   ],
-
 
   "hyprland/workspaces": {
     "format": "{name}",
@@ -65,7 +63,7 @@
   },
 
   "memory": {
-    "format": " {used:0.1f}G/{total:0.1f}G",
+    "format": " {used:0.1f}G/{total:0.1f}G",
     "interval": 2
   },
 
@@ -149,23 +147,16 @@
     "on-click": "kitty -e bash -lc 'sudo pacman -Syu; read -n 1'"
   },
 
-"power-profiles-daemon": {
-    "format": "{icon} {profile}",
-    "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
-    "tooltip": true,
-    "format-icons": {
-      "default": "",
-      "performance": "",
-      "balanced": "",
-      "power-saver": ""
-    }
-},
-
-  "custom/focus": {
-    "exec": "~/.config/waybar/scripts/focus-waybar.sh",
-    "return-type": "json",
-    "interval": 1,
-    "on-click": "~/.config/hypr/scripts/focus-mode.sh toggle"
+  "power-profiles-daemon": {
+      "format": "{icon} {profile}",
+      "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
+      "tooltip": true,
+      "format-icons": {
+        "default": "",
+        "performance": "",
+        "balanced": "",
+        "power-saver": ""
+      }
   },
 
   "custom/swaync-dnd": {

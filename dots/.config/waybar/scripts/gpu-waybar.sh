@@ -7,7 +7,7 @@ if command -v nvidia-smi >/dev/null 2>&1; then
   temp=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits | head -n1 | tr -d ' ')
   pwr=$(nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits | head -n1 | tr -d ' ')
   name=$(nvidia-smi --query-gpu=name --format=csv,noheader | head -n1)
-  echo "{\"text\":\"GPU ${util}%\",\"tooltip\":\"${name}\nTemp: ${temp}°C\nPower: ${pwr}W\"}"
+  echo "{\"text\":\" ${util}%\",\"tooltip\":\"${name}\nTemp: ${temp}°C\nPower: ${pwr}W\"}"
 else
-  echo "{\"text\":\"GPU iGPU\",\"tooltip\":\"nvidia-smi not found\"}"
+  echo "{\"text\":\" iGPU\",\"tooltip\":\"nvidia-smi not found\"}"
 fi

@@ -8,7 +8,7 @@ rpm_path="$(ls -1 /sys/class/hwmon/hwmon*/fan*_input 2>/dev/null | head -n1 || t
 
 if [ -n "${rpm_path}" ] && [ -r "${rpm_path}" ]; then
   rpm=$(cat "${rpm_path}")
-  echo "{\"text\":\"FAN ${rpm}rpm\",\"tooltip\":\"Source: ${rpm_path}\"}"
+  echo "{\"text\":\" ${rpm}rpm\",\"tooltip\":\"Source: ${rpm_path}\"}"
 else
-  echo "{\"text\":\"FAN --\",\"tooltip\":\"No fan sensor found\"}"
+  echo "{\"text\":\" --\",\"tooltip\":\"No fan sensor found\"}"
 fi
