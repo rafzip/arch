@@ -1,7 +1,8 @@
 {
   "layer": "top",
   "position": "top",
-  "height": 28,
+  "height": 22,
+  "margin-top": 2,
   "exclusive": true,
   "passthrough": false,
   "gtk-layer-shell": true,
@@ -21,21 +22,21 @@
     "custom/power",
     "custom/fans",
     "disk",
-    "custom/net"
-  ],
-
-  "modules-right": [
+    "custom/net",
     "power-profiles-daemon",
     "custom/swaync-dnd",
     "custom/notifications",
+    "custom/updates",
+    "idle_inhibitor"
+  ],
+
+  "modules-right": [
     "pulseaudio",
     "network",
     "battery",
     "backlight",
     "clock",
-    "tray",
-    "custom/updates",
-    "idle_inhibitor"
+    "tray"
   ],
 
   "hyprland/workspaces": {
@@ -177,5 +178,13 @@
     "on-click": "swaync-client -t -sw",
     "on-click-right": "swaync-client -d -sw",
     "escape": true
+  },
+
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "",
+      "deactivated": ""
+    }
   }
 }
