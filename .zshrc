@@ -92,3 +92,5 @@ alias zshre='exec zsh'
 
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+. "$HOME/.local/bin/env"
