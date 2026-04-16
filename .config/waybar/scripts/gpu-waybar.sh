@@ -4,7 +4,7 @@ set -euo pipefail
 
 # Fast fallback output
 fallback() {
-echo '{"text":"󰌢 dGPU off","tooltip":"NVIDIA GPU unavailable or powered down"}'
+echo '{"text":"󰌢 dGPU unavalible","tooltip":"NVIDIA GPU unavailable or powered down"}'
 }
 
 # No nvidia-smi installed
