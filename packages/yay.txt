@@ -1,3 +1,0 @@
-zen-browser-bin
-bambustudio-bin
-vesktop-bin

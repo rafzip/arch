@@ -29,8 +29,6 @@ link() {
 chmod +x "$ROOT/.config/hypr/scripts/"*.sh 2>/dev/null || true
 chmod +x "$ROOT/.config/waybar/scripts/"*.sh 2>/dev/null || true
 
-link "$ROOT/.zshrc" "$HOME/.zshrc"
-
 link "$ROOT/.config/hypr"   "$HOME/.config/hypr"
 link "$ROOT/.config/waybar" "$HOME/.config/waybar"
 link "$ROOT/.config/swaync" "$HOME/.config/swaync"

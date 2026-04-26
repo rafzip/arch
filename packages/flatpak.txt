@@ -1,2 +1,0 @@
-flathub com.modrinth.ModrinthApp
-flathub io.github.nacho.mecalin
