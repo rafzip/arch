@@ -38,31 +38,9 @@ link "$ROOT/.config/fastfetch"  "$HOME/.config/fastfetch"
 link "$ROOT/.config/cava"  "$HOME/.config/cava"
 link "$ROOT/.config/wlogout"  "$HOME/.config/wlogout"
 
-replace_zshrc="${DOTS_REPLACE_ZSHRC:-ask}"
-should_replace=0
-
-case "$replace_zshrc" in
-  yes|YES|y|Y|1|true|TRUE)
-    should_replace=1
-    ;;
-  no|NO|n|N|0|false|FALSE)
-    should_replace=0
-    ;;
-  ask|ASK|"")
-    if [[ -t 0 ]]; then
-      read -p "Replace old .zshrc? (y/n) " -n 1 -r
-      echo
-      [[ $REPLY =~ ^[Yy]$ ]] && should_replace=1
-    fi
-    ;;
-  *)
-    echo "Unknown DOTS_REPLACE_ZSHRC value '$replace_zshrc', defaulting to 'no'."
-    ;;
-esac
-
-if [[ "$should_replace" -eq 1 ]]; then
-  rm -f "$HOME/.zshrc"
-  ln -s "$ROOT/.zshrc" "$HOME/.zshrc"
+if [ -d /etc/ly ]; then
+  echo "Copying ly/config.ini -> /etc/ly/config.ini (requires sudo)"
+  sudo cp "$ROOT/ly/config.ini" /etc/ly/config.ini
 fi
 
 echo "Done. Log out and start Hyprland."
