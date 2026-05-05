@@ -1,0 +1,25 @@
+hl.config({
+    general = {
+        gaps_in     = 4,
+        gaps_out    = 4,
+        border_size = 1,
+        col = {
+            active_border = "rgb(a3a3a3)",
+        },
+        layout = "dwindle",
+    },
+
+    decoration = {
+        rounding = 10,
+        blur = {
+            enabled           = true,
+            size              = 2,
+            passes            = 2,
+            new_optimizations = true,
+        },
+    },
+
+    animations = {
+        enabled = true,
+    },
+})
