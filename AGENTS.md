@@ -8,7 +8,7 @@ Arch Linux dotfiles for a Hyprland desktop. `install-dots.sh` symlinks everythin
 
 ## IMPORTANT INFO
 
-check the docs every time before doin config stuff https://wiki.hypr.land/  https://archlinux.org/ 
+check the docs every time before doin config stuff https://wiki.hypr.land/  https://wiki.archlinux.org/ 
 
 check hypr configs for errors with `hyprctl configerrors`
 
