@@ -1,0 +1,17 @@
+timeout: 3
+default_entry: 1
+interface_branding: Artix
+
+/Artix Linux
+    protocol: linux
+    path: boot():/vmlinuz-linux
+    cmdline: cryptdevice=UUID=REPLACE_LUKS_UUID:cryptroot root=/dev/mapper/cryptroot rootflags=subvol=@ rw nvidia_drm.modeset=1 nvidia_drm.fbdev=1 quiet loglevel=3
+    module_path: boot():/amd-ucode.img
+    module_path: boot():/initramfs-linux.img
+
+/Artix Linux (fallback)
+    protocol: linux
+    path: boot():/vmlinuz-linux
+    cmdline: cryptdevice=UUID=REPLACE_LUKS_UUID:cryptroot root=/dev/mapper/cryptroot rootflags=subvol=@ rw
+    module_path: boot():/amd-ucode.img
+    module_path: boot():/initramfs-linux-fallback.img
