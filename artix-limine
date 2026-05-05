@@ -1,0 +1,9 @@
+pacman -S limine
+mkdir -p /boot/EFI/BOOT
+cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT/BOOTX64.EFI
+cp /usr/share/limine/BOOTX64.EFI /boot/EFI/limine/limine_x64.efi 2>/dev/null || \
+  { mkdir -p /boot/EFI/limine && cp /usr/share/limine/BOOTX64.EFI /boot/EFI/limine/limine_x64.efi; }
+
+# NVRAM entry (skip on flaky firmware — fallback path above will boot anyway)
+efibootmgr --create --disk /dev/nvme0n1 --part 1 \
+  --label "Artix Limine" --loader '\EFI\limine\limine_x64.efi' --unicode
