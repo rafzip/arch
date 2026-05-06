@@ -50,7 +50,7 @@ PACMAN_PKGS=(
   brightnessctl
 
   # Terminal
-  kitty
+  ghostty
 
   # Notifications
   swaync
@@ -89,7 +89,7 @@ AUR_PKGS=(
   pyprland          # pypr scratchpad and plugin system
   bibata-cursor-theme
   zen-browser-bin
-  obsidian
+  visual-studio-code-bin
   ly                # TUI login manager
 )
 

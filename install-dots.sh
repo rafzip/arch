@@ -36,6 +36,7 @@ link "$ROOT/.config/wofi"   "$HOME/.config/wofi"
 link "$ROOT/.config/kitty"  "$HOME/.config/kitty"
 link "$ROOT/.config/fastfetch"  "$HOME/.config/fastfetch"
 link "$ROOT/.config/cava"  "$HOME/.config/cava"
+link "$ROOT/.config/ghostty"  "$HOME/.config/ghostty"
 link "$ROOT/.config/wlogout"  "$HOME/.config/wlogout"
 
 if [ -d /etc/ly ]; then
