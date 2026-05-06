@@ -10,6 +10,11 @@
 	},
 	"modules": [
 		{
+			"key": " ",
+			"type": "custom",
+			"keyColor": "white"
+		},
+		{
 			"key": "╭─────────────╮",
 			"type": "custom",
 			"keyColor": "white"
@@ -38,37 +43,37 @@
 		},
 		{
 			"type": "wm",
-			"key": "│{#35} 󱗃 WM        │ ",
+			"key": "│{#35} 󱗃 WM        {#white}│ ",
 			"format": "{2}",
 			"keyColor": "white"
 		},
 		{
 			"type": "cpu",
 			"format": "{1} @ {7}",
-			"key": "│{#36}  CPU       │ ",
+			"key": "│{#36}  CPU       {#white}│ ",
 			"keyColor": "white"
 		},
 		{
 			"type": "gpu",
 			"format": "{1} {2}",
-			"key": "│{#38;2;203;166;247} 󰊴 GPU       │ ",
+			"key": "│{#38;2;203;166;247} 󰊴 GPU       {#white}│ ",
 			"keyColor": "white"
 		},
 		{
 			"type": "memory",
 			"format": "{1} / {2}",
-			"key": "│{#38;2;180;190;254}  Memory    │ ",
+			"key": "│{#38;2;180;190;254}  Memory    {#white}│ ",
 			"keyColor": "white"
 		},
 		{
 			"type": "command",
-			"key": "│{#38;2;250;179;135} 󱦟 OS Age    │ ",
+			"key": "│{#38;2;250;179;135} 󱦟 OS Age    {#white}│ ",
 			"keyColor": "white",
 			"text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
 		},
 		{
 			"type": "uptime",
-			"key": "│{#38;2;137;220;235} 󱫐 Uptime    │ ",
+			"key": "│{#38;2;137;220;235} 󱫐 Uptime    {#white}│ ",
 			"keyColor": "white"
 		},
 		{
